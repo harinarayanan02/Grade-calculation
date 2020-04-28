@@ -1,0 +1,76 @@
+import pandas as pd
+df = pd.read_csv(‘data/student-mat.csv’)
+df.head()
+
+import matplotlib.pyplot as plt
+# Histogram of grades
+plt.hist(df['Grade'], bins = 14)
+plt.xlabel('Grade')
+plt.ylabel('Count')
+plt.title('Distribution of Final Grades')
+
+import seaborn as sns
+# Make one plot for each different location
+sns.kdeplot(df.ix[df['address'] == 'U', 'Grade'], 
+            label = 'Urban', shade = True)
+sns.kdeplot(df.ix[df['address'] == 'R', 'Grade'], 
+            label = 'Rural', shade = True)
+# Add labeling
+plt.xlabel('Grade')
+plt.ylabel('Density')
+plt.title('Density Plot of Final Grades by Location')
+
+# Find correlations and sort
+df.corr()['Grade'].sort_values()
+failures     -0.384569
+absences     -0.204230
+Dalc         -0.196891
+Walc         -0.178839
+traveltime   -0.129654
+goout        -0.111228
+freetime     -0.105206
+health       -0.096461
+age          -0.042505
+famrel        0.072888
+Fedu          0.204392
+studytime     0.249855
+Medu          0.278690
+
+import seaborn as sns
+# Make one plot for each different location
+sns.kdeplot(df.ix[df['address'] == 'U', 'Grade'], 
+            label = 'Urban', shade = True)
+sns.kdeplot(df.ix[df['address'] == 'R', 'Grade'], 
+            label = 'Rural', shade = True)
+# Add labeling
+plt.xlabel('Grade')
+plt.ylabel('Density')
+plt.title('Density Plot of Final Grades by Location')
+
+from sklearn.model_selection import train_test_split
+# df is features and labels are the targets 
+# Split by putting 25% in the testing set
+X_train, X_test, y_train, y_test = train_test_split(df, labels, 
+                                                   test_size = 0.25,
+                                                    random_state=42)
+                                                    
+                                                    # X_train is our training data, we will make a copy for plotting
+X_plot = X_train.copy()
+# Compare grades to the median
+X_plot['relation_median'] = (X_plot['Grade'] >= 12)
+X_plot['Grade'] = X_plot['Grade'].replace({True: 'above', 
+                                          False: 'below'})
+# Plot all variables in a loop
+plt.figure(figsize=(12, 12))
+for i, col in enumerate(X_plot.columns[:-1]):
+    plt.subplot(3, 2, i + 1)
+    subset_above = X_plot[X_plot['relation_median'] == 'above']
+    subset_below = X_plot[X_plot['relation_median'] == 'below']
+    sns.kdeplot(subset_above[col], label = 'Above Median')
+    sns.kdeplot(subset_below[col], label = 'Below Median')
+    plt.legend()
+    plt.title('Distribution of %s' % col)
+    
+plt.tight_layout()
+
+Grade = 9.19 - 1.32 * failures + 1.86 * higher_edu + 0.26 * mother_edu + 0.58 * studytime + 0.03 * father_edu - 0.07 * absences
